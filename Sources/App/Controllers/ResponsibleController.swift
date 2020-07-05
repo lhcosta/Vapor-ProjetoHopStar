@@ -28,7 +28,11 @@ class ResponsibleController: RouteCollection {
         try Responsible.validate(req)
         let resp = try req.content.decode(Responsible.self)
         let newResp = try Responsible(nome: resp.name, email: resp.email, password: Bcrypt.hash(resp.password))
-        return newResp.save(on: req.db).map({ newResp })
+        
+        return newResp.save(on: req.db)
+            .flatMapErrorThrowing {_ in
+                throw Abort(.badRequest, reason: "Duplicate emails in database")
+            }.map { newResp }
     }
     
     /// Realizando login do usuário.
