@@ -7,7 +7,9 @@ public func configure(_ app: Application) throws {
     // uncomment to serve files from /Public folder
     // app.middleware.use(FileMiddleware(publicDirectory: app.directory.publicDirectory))
 
-    app.databases.use(.postgres(url: "DATABASE_URL"), as: .psql)
+    if let url = Environment.get("DATABASE_URL"), let config = PostgresConfiguration(url: url) {
+        app.databases.use(.postgres(configuration: config), as: .psql)
+    }
     
     app.migrations.add(ResponsibleMigration())
     app.migrations.add(PatientMigration())
