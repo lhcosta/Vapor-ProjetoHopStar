@@ -14,6 +14,7 @@ struct TemperatureMigration: Migration {
         database.schema("Temperature")
             .field(.id, .int, .identifier(auto: true))
             .field("value", .float)
+            .field("created_at", .date)
             .field("patient_id", .uuid, .references("Patient", .id))
             .create()
     }

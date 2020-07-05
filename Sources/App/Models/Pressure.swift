@@ -10,10 +10,10 @@ import Fluent
 import Vapor
 
 final class Pressure: Model, Content {
-    
+        
     static let schema = "Pressure"
-
-    @ID(key: .id)
+    
+    @ID(custom: "id")
     var id: Int?
     
     @Field(key: "diastolic")

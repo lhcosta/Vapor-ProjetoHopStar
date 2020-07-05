@@ -15,6 +15,7 @@ struct PressureMigration: Migration {
             .field(.id, .int, .identifier(auto: true))
             .field("diastolic", .float)
             .field("systolic", .float)
+            .field("created_at", .date)
             .field("patient_id", .uuid, .references("Patient", .id))
             .create()
     }

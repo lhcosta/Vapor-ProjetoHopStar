@@ -32,13 +32,10 @@ class PatientController: RouteCollection {
     /// - Throws: paciente não encontrado.
     /// - Returns: todas as pressões do paciente.
     func selectPressure(_ req: Request) throws -> EventLoopFuture<[Pressure]> {
-        guard let id_string = req.parameters.get("id"), let id = UUID(uuidString: id_string) else { throw Abort(.noContent)}
-        
-        return Patient.find(id, on: req.db).flatMapThrowing { (patient) -> [Pressure] in
-            guard let patient = patient else { throw Abort(.notFound) }
-            return patient.pressures
+        let patient = try selectPatient(req)
+        return patient.flatMap {
+            $0.$pressures.query(on: req.db).all()
         }
-        .map({$0})
     }
     
     /// Selecionando todas as temperaturas do usuário.
@@ -46,13 +43,16 @@ class PatientController: RouteCollection {
     /// - Throws: paciente não encontrado.
     /// - Returns: todas as temperaturas do paciente.
     func selectTemperature(_ req: Request) throws -> EventLoopFuture<[Temperature]> {
-        guard let id_string = req.parameters.get("id"), let id = UUID(uuidString: id_string) else { throw Abort(.noContent)}
-        
-        return Patient.find(id, on: req.db).flatMapThrowing { (patient) -> [Temperature] in
-            guard let patient = patient else { throw Abort(.notFound) }
-            return patient.temperatures
+        let patient = try selectPatient(req)
+        return patient.flatMap {
+            $0.$temperatures.query(on: req.db).all()
         }
-        .map({$0})
+    }
+    
+    func selectPatient(_ req: Request) throws -> EventLoopFuture<Patient> {
+        guard let id_string = req.parameters.get("id"), let id = UUID(uuidString: id_string) else { throw Abort(.noContent)}
+        return Patient.find(id, on: req.db)
+            .unwrap(or: Abort(.notFound))
     }
     
 }

@@ -13,7 +13,7 @@ final class Temperature: Model, Content {
     
     static let schema = "Temperature"
     
-    @ID(key: .id)
+    @ID(custom: "id")
     var id: Int?
     
     @Field(key: "value")
@@ -27,7 +27,7 @@ final class Temperature: Model, Content {
     
     init() {}
     
-    init(value: Float, date: Date, paciente: UUID) {
+    init(value: Float, paciente: UUID) {
         self.value = value
         self.$patient.id = paciente
     }

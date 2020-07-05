@@ -44,13 +44,16 @@ class ResponsibleController: RouteCollection {
     /// - Throws: responsável não existente.
     /// - Returns: todos os pacientes de um responsável.
     func selectAllPatients(_ req: Request) throws -> EventLoopFuture<[Patient]> {
-        guard let resp_id = req.parameters.get("resp_id"), let id = UUID(resp_id) else { throw Abort(.noContent) }
-        return Responsible.find(id, on: req.db)
-            .flatMapThrowing { (resp) -> [Patient] in
-                guard let resp = resp else { throw Abort(.notFound) }
-                return resp.patients
+        let resp = try selectResponsible(req)
+        return resp.flatMap {
+            $0.$patients.query(on: req.db).all()
         }
-        .map({$0})
+    }
+    
+    func selectResponsible(_ req: Request) throws -> EventLoopFuture<Responsible> {
+        guard let resp_id = req.parameters.get("id"), let id = UUID(resp_id) else { throw Abort(.noContent) }
+        return Responsible.find(id, on: req.db)
+            .unwrap(or: Abort(.notFound))
     }
     
 }
