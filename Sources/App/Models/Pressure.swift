@@ -37,3 +37,9 @@ final class Pressure: Model, Content {
     }
     
 }
+
+extension Pressure {
+    func mapper() -> PressureDTO {
+        return PressureDTO(diastolic: self.diastolic, systolic: self.systolic)
+    }
+}

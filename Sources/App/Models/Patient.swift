@@ -31,6 +31,14 @@ final class Patient : Model, Content {
     @OptionalParent(key: "resp_id")
     var responsible: Responsible?
     
+    //ONE-TO-ONE
+    @Children(for: \.$patient)
+    var defaultPressure: [Pressure]
+    
+    //ONE-TO-ONE
+    @Children(for: \.$patient)
+    var defaultTemperature: [Temperature]
+    
     @Children(for: \.$patient)
     var pressures: [Pressure]
     
@@ -39,22 +47,27 @@ final class Patient : Model, Content {
 
     init() {}
     
-    init(name: String, genre: String, age: Int, address: String, respId: UUID) {
+    init(name: String, genre: String, age: Int, address: String, respId: UUID?) {
         self.name = name
         self.genre = genre
         self.age = age
         self.address = address
         self.$responsible.id = respId
+
     }
 }
 
-extension Patient: Validatable {
+extension Patient {
     
-    static func validations(_ validations: inout Validations) {
-        validations.add("name", as: String.self, is: !.empty, required: true)
-        validations.add("genre", as: String.self, is: !.empty, required: true)
-        validations.add("age", as: Int.self, is: .range(1...100), required: true)
-        validations.add("address", as: String.self, is: !.empty && .count(10...60), required: true)
-    }    
+    func mapper(defaultTemp: TemperatureDTO, defaultPressure: PressureDTO) -> PatientDTO {
+        return PatientDTO(id: self.id, 
+                          name: self.name, 
+                          address: self.address,
+                          age: self.age,
+                          genre: self.genre, 
+                          responsible: self.responsible?.id, 
+                          defaultTemp: defaultTemp, 
+                          defaultPressure: defaultPressure)
+    }
 }
 

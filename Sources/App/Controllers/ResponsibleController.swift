@@ -32,7 +32,7 @@ class ResponsibleController: RouteCollection {
         return newResp.save(on: req.db)
             .flatMapErrorThrowing {_ in
                 throw Abort(.badRequest, reason: "Duplicate emails in database")
-            }.map { newResp }
+        }.map { newResp }
     }
     
     /// Realizando login do usuário.
@@ -47,10 +47,19 @@ class ResponsibleController: RouteCollection {
     /// - Parameter req: GET Request
     /// - Throws: responsável não existente.
     /// - Returns: todos os pacientes de um responsável.
-    func selectAllPatients(_ req: Request) throws -> EventLoopFuture<[Patient]> {
+    func selectAllPatients(_ req: Request) throws -> EventLoopFuture<[PatientDTO]> {
         let resp = try selectResponsible(req)
-        return resp.flatMap {
-            $0.$patients.query(on: req.db).all()
+        let patients = resp.flatMap { (resp) -> EventLoopFuture<[Patient]> in
+            resp.$patients
+                .query(on: req.db)
+                .with(\.$defaultPressure)
+                .with(\.$defaultTemperature)
+                .all()
+        }
+        
+        return patients.mapEach {
+            $0.mapper(defaultTemp: $0.$defaultTemperature.wrappedValue.first!.mapper(), 
+                      defaultPressure: $0.$defaultPressure.wrappedValue.first!.mapper())
         }
     }
     

@@ -33,3 +33,8 @@ final class Temperature: Model, Content {
     }
 }
 
+extension Temperature {
+    func mapper() -> TemperatureDTO {
+        return TemperatureDTO(value: self.value)
+    }
+}

@@ -22,5 +22,4 @@ class PressureController: RouteCollection {
         let pressure = try req.content.decode(Pressure.self) 
         return Pressure.create(pressure)(on: req.db).map({pressure})
     }
-    
 }
