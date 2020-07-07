@@ -80,8 +80,8 @@ class PatientController: RouteCollection {
     /// - Parameter req: DELETE Request
     /// - Throws: paciente não encontrado.
     /// - Returns: status da ação.
-    func delete(_ req: Request) throws -> EventLoopFuture<HTTPStatus> {
-        let patient = try selectPatient(req)
+    func delete(_ req: Request) throws -> EventLoopFuture<HTTPResponseStatus> {
+        return try selectPatient(req)
         .map { $0.delete(on: req.db) }
         .transform(to: HTTPStatus.ok)
     }
