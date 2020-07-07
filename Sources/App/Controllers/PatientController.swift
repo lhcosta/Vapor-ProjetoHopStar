@@ -21,10 +21,27 @@ class PatientController: RouteCollection {
     /// - Parameter req: POST Request.
     /// - Throws: erro ao criar um novo paciente.
     /// - Returns: paciente criado.
-    func create(_ req: Request) throws -> EventLoopFuture<Patient> {
-        try Patient.validate(req)
-        let paciente = try req.content.decode(Patient.self)
-        return Patient.create(paciente)(on: req.db).map { paciente }    
+    func create(_ req: Request) throws -> EventLoopFuture<PatientDTO> {
+        
+        try PatientDTO.validate(req)
+        let patientDTO = try req.content.decode(PatientDTO.self)
+        
+        let patient = Patient(name: patientDTO.name, 
+                              genre: patientDTO.genre, 
+                              age: patientDTO.age, 
+                              address: patientDTO.address, 
+                              respId: patientDTO.responsible)
+        
+        return Patient.save(patient)(on: req.db).map({ 
+            
+            let pressure = Pressure(diastolic: patientDTO.defaultPressure.diastolic, systolic: patientDTO.defaultPressure.systolic, paciente: patient.id!)
+            let temp = Temperature(value: patientDTO.defaultTemp.value, paciente: patient.id!)
+            
+            _ = Pressure.save(pressure)(on: req.db)
+            _ = Temperature.save(temp)(on: req.db)
+            
+            return patient.mapper(defaultTemp: temp.mapper(), defaultPressure: pressure.mapper())
+        })
     }
     
     /// Selecionando todas as pressões do usuário.
