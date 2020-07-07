@@ -37,7 +37,7 @@ extension PatientDTO: Validatable {
         validations.add("name", as: String.self, is: !.empty, required: true)
         validations.add("genre", as: String.self, is: !.empty, required: true)
         validations.add("age", as: Int.self, is: .range(1...100), required: true)
-        validations.add("address", as: String.self, is: !.empty && .count(10...60), required: true)
+        validations.add("address", as: String.self, is: !.empty && .count(5...60), required: true)
         validations.add("defaultTemp", as: TemperatureDTO.self, required: true)
         validations.add("defaultPressure", as: PressureDTO.self, required: true)
     }    

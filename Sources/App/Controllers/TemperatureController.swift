@@ -19,9 +19,9 @@ class TemperatureController: RouteCollection {
     /// Criando uma nova temperatura do paciente. 
     /// - Parameter req: POST Request
     /// - Returns: temperatura criada.
-    func create(_ req: Request) throws -> EventLoopFuture<Temperature> {
+    func create(_ req: Request) throws -> EventLoopFuture<TemperatureDTO> {
         let temperature = try req.content.decode(Temperature.self) 
-        return Temperature.create(temperature)(on: req.db).map({temperature})
+        return Temperature.create(temperature)(on: req.db).map({ temperature.mapper() })
     }
     
 }

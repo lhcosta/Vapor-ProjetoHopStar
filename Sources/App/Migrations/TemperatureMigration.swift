@@ -15,6 +15,7 @@ struct TemperatureMigration: Migration {
             .field(.id, .int, .identifier(auto: true))
             .field("value", .float)
             .field("created_at", .date)
+            .field("is_default", .bool)
             .field("patient_id", .uuid, .references("Patient", .id))
             .create()
     }

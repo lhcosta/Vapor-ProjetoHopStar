@@ -52,14 +52,16 @@ class ResponsibleController: RouteCollection {
         let patients = resp.flatMap { (resp) -> EventLoopFuture<[Patient]> in
             resp.$patients
                 .query(on: req.db)
-                .with(\.$defaultPressure)
-                .with(\.$defaultTemperature)
+                .with(\.$pressures)
+                .with(\.$temperatures)
                 .all()
         }
         
-        return patients.mapEach {
-            $0.mapper(defaultTemp: $0.$defaultTemperature.wrappedValue.first!.mapper(), 
-                      defaultPressure: $0.$defaultPressure.wrappedValue.first!.mapper())
+        return patients.mapEach { (patient) -> PatientDTO in
+            let pressureDefault = patient.pressures.first(where: { $0.isDefault == true })!
+            let temperatureDefault = patient.temperatures.first(where: { $0.isDefault == true })!
+            
+            return patient.mapper(defaultTemp: temperatureDefault.mapper(), defaultPressure: pressureDefault.mapper())
         }
     }
     

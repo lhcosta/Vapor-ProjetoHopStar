@@ -28,11 +28,15 @@ final class Pressure: Model, Content {
     @Parent(key: "patient_id")
     var patient: Patient
     
+    @Field(key: "is_default")
+    var isDefault: Bool?
+    
     init() {}
     
-    init(diastolic: Float, systolic: Float, paciente: UUID) {
+    init(diastolic: Float, systolic: Float, isDefault: Bool? = false, paciente: UUID) {
         self.diastolic = diastolic
         self.systolic = systolic
+        self.isDefault = isDefault
         self.$patient.id = paciente
     }
     

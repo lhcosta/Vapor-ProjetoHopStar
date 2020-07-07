@@ -34,8 +34,8 @@ class PatientController: RouteCollection {
         
         return Patient.save(patient)(on: req.db).map({ 
             
-            let pressure = Pressure(diastolic: patientDTO.defaultPressure.diastolic, systolic: patientDTO.defaultPressure.systolic, paciente: patient.id!)
-            let temp = Temperature(value: patientDTO.defaultTemp.value, paciente: patient.id!)
+            let pressure = Pressure(diastolic: patientDTO.defaultPressure.diastolic, systolic: patientDTO.defaultPressure.systolic, isDefault: true, paciente: patient.id!)
+            let temp = Temperature(value: patientDTO.defaultTemp.value, isDefault: true, paciente: patient.id!)
             
             _ = Pressure.save(pressure)(on: req.db)
             _ = Temperature.save(temp)(on: req.db)
@@ -48,22 +48,30 @@ class PatientController: RouteCollection {
     /// - Parameter req: GET Request
     /// - Throws: paciente não encontrado.
     /// - Returns: todas as pressões do paciente.
-    func selectPressure(_ req: Request) throws -> EventLoopFuture<[Pressure]> {
+    func selectPressure(_ req: Request) throws -> EventLoopFuture<[PressureDTO]> {
         let patient = try selectPatient(req)
         return patient.flatMap {
-            $0.$pressures.query(on: req.db).all()
+            $0.$pressures.query(on: req.db)
+                .filter(\.$isDefault == false)
+                .sort(\.$date)
+                .all()
         }
+        .mapEach({ $0.mapper() })
     }
     
     /// Selecionando todas as temperaturas do usuário.
     /// - Parameter req: GET Request
     /// - Throws: paciente não encontrado.
     /// - Returns: todas as temperaturas do paciente.
-    func selectTemperature(_ req: Request) throws -> EventLoopFuture<[Temperature]> {
+    func selectTemperature(_ req: Request) throws -> EventLoopFuture<[TemperatureDTO]> {
         let patient = try selectPatient(req)
         return patient.flatMap {
-            $0.$temperatures.query(on: req.db).all()
+            $0.$temperatures.query(on: req.db)
+                .filter(\.$isDefault == false)
+                .sort(\.$date)
+                .all()
         }
+        .mapEach({ $0.mapper() })
     }
     
     func selectPatient(_ req: Request) throws -> EventLoopFuture<Patient> {

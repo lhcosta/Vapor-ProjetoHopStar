@@ -18,8 +18,8 @@ class PressureController: RouteCollection {
     /// Criando uma nova pressão do usuário. 
     /// - Parameter req: POST Request
     /// - Returns: pressão criada.
-    func create(_ req: Request) throws -> EventLoopFuture<Pressure> {
+    func create(_ req: Request) throws -> EventLoopFuture<PressureDTO> {
         let pressure = try req.content.decode(Pressure.self) 
-        return Pressure.create(pressure)(on: req.db).map({pressure})
+        return Pressure.create(pressure)(on: req.db).map({ pressure.mapper() })
     }
 }

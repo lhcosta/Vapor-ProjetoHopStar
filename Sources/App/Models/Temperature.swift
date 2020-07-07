@@ -19,6 +19,9 @@ final class Temperature: Model, Content {
     @Field(key: "value")
     var value: Float
     
+    @Field(key: "is_default")
+    var isDefault: Bool?
+    
     @Timestamp(key: "created_at", on: .create)
     var date: Date?
     
@@ -27,9 +30,10 @@ final class Temperature: Model, Content {
     
     init() {}
     
-    init(value: Float, paciente: UUID) {
+    init(value: Float, isDefault: Bool? = false, paciente: UUID) {
         self.value = value
         self.$patient.id = paciente
+        self.isDefault = isDefault
     }
 }
 

@@ -30,15 +30,7 @@ final class Patient : Model, Content {
     
     @OptionalParent(key: "resp_id")
     var responsible: Responsible?
-    
-    //ONE-TO-ONE
-    @Children(for: \.$patient)
-    var defaultPressure: [Pressure]
-    
-    //ONE-TO-ONE
-    @Children(for: \.$patient)
-    var defaultTemperature: [Temperature]
-    
+        
     @Children(for: \.$patient)
     var pressures: [Pressure]
     
@@ -53,7 +45,6 @@ final class Patient : Model, Content {
         self.age = age
         self.address = address
         self.$responsible.id = respId
-
     }
 }
 
