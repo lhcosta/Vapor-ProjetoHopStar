@@ -15,7 +15,6 @@ class PatientController: RouteCollection {
         paciente.post(use: create(_:))
         paciente.get(":id", "pressure", use: selectPressure(_:))
         paciente.get(":id", "temperature", use: selectTemperature(_:))
-        paciente.delete(":id", use: delete(_:))
     }
     
     /// Criando um paciente
@@ -76,16 +75,10 @@ class PatientController: RouteCollection {
     }
     
     
-    /// Deletar um paciente.
-    /// - Parameter req: DELETE Request
+    /// Selecionando paciente por ID
+    /// - Parameter req: GET Request
     /// - Throws: paciente não encontrado.
-    /// - Returns: status da ação.
-    func delete(_ req: Request) throws -> EventLoopFuture<HTTPResponseStatus> {
-        return try selectPatient(req)
-            .map { $0.delete(force: true, on: req.db) }
-            .transform(to: HTTPStatus.ok)
-    }
-    
+    /// - Returns: paciente.
     func selectPatient(_ req: Request) throws -> EventLoopFuture<Patient> {
         guard let id_string = req.parameters.get("id"), let id = UUID(uuidString: id_string) else { throw Abort(.noContent)}
         return Patient.find(id, on: req.db)

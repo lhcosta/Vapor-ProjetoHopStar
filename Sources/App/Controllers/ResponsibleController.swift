@@ -65,6 +65,10 @@ class ResponsibleController: RouteCollection {
         }
     }
     
+    /// Selecionando responsável por id.
+    /// - Parameter req: GET Request
+    /// - Throws: responsável não encontrado.
+    /// - Returns: responsável solicitado.
     func selectResponsible(_ req: Request) throws -> EventLoopFuture<Responsible> {
         guard let resp_id = req.parameters.get("id"), let id = UUID(resp_id) else { throw Abort(.noContent) }
         return Responsible.find(id, on: req.db)
